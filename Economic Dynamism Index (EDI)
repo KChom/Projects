@@ -1,56 +1,79 @@
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 import requests
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Top 10 most populated nations
-countries = ["China", "India", "USA", "Indonesia", "Pakistan", "Brazil", "Nigeria", "Bangladesh", "Russia", "Mexico"]
+# List of top 10 most populated countries
+countries = [
+    "China", "India", "United States", "Indonesia", "Pakistan", 
+    "Brazil", "Nigeria", "Bangladesh", "Russia", "Mexico"
+]
 
-# Function fetching economic data (replace with actual data sources or APIs)
-def fetch_economy_data(country):
-    # PlaceHolder: Replace with actual data API calls for each indicator
-    data = {
-        'Ease of Doing Business': np.random.rand(),  # Random value, replace with real data
-        'R&D % of GDP': np.random.rand(),            # Random value, replace with real data
-        'Capital Formation % of GDP': np.random.rand(), # Random value, replace with real data
-        'Labor Flexibility': np.random.rand(),       # Random value, replace with real data
-        'Macroeconomic Stability': np.random.rand(),  # Random value, replace with real data
-    }
-    return data
+# Function to fetch data from live APIs (replace with real endpoints)
+def fetch_data(country_code):
+    # Example for market volatility (replace with a valid API)
+    mv_url = f"https://api.example.com/market_volatility/{country_code}"
+    ii_url = f"https://api.example.com/innovation_index/{country_code}"
+    lmm_url = f"https://api.example.com/labor_market_mobility/{country_code}"
+    ea_url = f"https://api.example.com/entrepreneurial_activity/{country_code}"
 
-# Collect data for each country
-country_data = []
+    # Simulate API responses (replace with actual API calls)
+    mv_response = {'market_volatility': np.random.random()}  # Replace with real API call
+    ii_response = {'innovation_index': np.random.random()}  # Replace with real API call
+    lmm_response = {'labor_market_mobility': np.random.random()}  # Replace with real API call
+    ea_response = {'entrepreneurial_activity': np.random.random()}  # Replace with real API call
+
+    # Extracting necessary values (adjust as per API response structure)
+    MV = mv_response['market_volatility']
+    II = ii_response['innovation_index']
+    LMM = lmm_response['labor_market_mobility']
+    EA = ea_response['entrepreneurial_activity']
+
+    return MV, II, LMM, EA
+
+# Economic Dynamism Index (EDI) Calculation
+def calculate_edi(MV, II, LMM, EA):
+    # Example weights for the factors (you can adjust based on real data importance)
+    w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25  # Equal weights for this example
+    
+    # Calculate EDI
+    edi = w1 * MV + w2 * II + w3 * LMM + w4 * EA
+    return edi
+
+# Create an empty list to hold data for all countries
+edi_data = []
+
+# Loop over each country and fetch its data
 for country in countries:
-    data = fetch_economy_data(country)
-    country_data.append(data)
+    # Simulate fetching data for each country (replace with actual country codes and API calls)
+    mv, ii, lmm, ea = fetch_data(country)
+    
+    # Calculate EDI for the country
+    edi = calculate_edi(mv, ii, lmm, ea)
+    
+    # Append country data and EDI score to the list
+    edi_data.append({'Country': country, 'EDI': edi})
 
-# Convert the collected data into a DataFrame
-df = pd.DataFrame(country_data, index=countries)
+# Convert the data into a DataFrame
+df = pd.DataFrame(edi_data)
 
-# Normalize the data (min-max scaling)
-df_normalized = df.apply(lambda x: (x - x.min()) / (x.max() - x.min()), axis=0)
+# Sort the countries by EDI value in ascending order (most dynamic to least dynamic)
+df_sorted = df.sort_values(by='EDI', ascending=True)
 
-# Weights for each indicator (equal weighting for simplicity)
-weights = [0.2, 0.2, 0.2, 0.2, 0.2]  # 5 indicators with equal weight
+# Add a Rank column based on sorted EDI values
+df_sorted['Rank'] = np.arange(1, len(df_sorted) + 1)
 
-# Calculate the Economic Dynamism Index (EDI)
-df_normalized['EDI'] = df_normalized.dot(weights)
+# Re-sort to keep the dataframe ordered by Rank (for final output order)
+df_sorted = df_sorted.sort_values(by='Rank', ascending=True)
 
-# Sort countries by EDI (higher EDI is better for economic fluidity)
-df_sorted = df_normalized.sort_values(by='EDI', ascending=False)
+# Create a heatmap of the EDI rankings
+plt.figure(figsize=(10, 8))
+sns.heatmap(df_sorted.set_index('Country').T, annot=True, cmap='YlGnBu', cbar=True, fmt=".2f", linewidths=0.5)
 
-# Get the top 10 countries by EDI
-top_10_edi = df_sorted.head(10)
-
-# Plotting a heatmap of the rankings
-plt.figure(figsize=(10, 6))
-sns.heatmap(top_10_edi.drop(columns=['EDI']), annot=True, cmap="coolwarm", fmt=".2f", linewidths=1)
-plt.title('Top 10 Most Populated Countries by Economic Dynamism (EDI)')
-plt.xlabel('Economic Indicators')
-plt.ylabel('Countries')
+# Set title and show plot
+plt.title('Economic Dynamism Index (EDI) Rankings of the Top 10 Most Populated Countries')
 plt.show()
 
-# Print the sorted EDI values for the countries
-print("Top 10 Countries by Economic Fluidity (EDI):")
-print(df_sorted[['EDI']])
+# Display the sorted dataframe
+df_sorted

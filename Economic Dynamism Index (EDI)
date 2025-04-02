@@ -4,12 +4,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import requests
 
-# List of top 10 most populated countries
+# Top 10 most populated nations
 countries = ["China", "India", "USA", "Indonesia", "Pakistan", "Brazil", "Nigeria", "Bangladesh", "Russia", "Mexico"]
 
-# Function to fetch economic data (replace with actual data sources or APIs)
+# Function fetching economic data (replace with actual data sources or APIs)
 def fetch_economy_data(country):
-    # Example: Replace with actual data API calls for each indicator
+    # PlaceHolder: Replace with actual data API calls for each indicator
     data = {
         'Ease of Doing Business': np.random.rand(),  # Random value, replace with real data
         'R&D % of GDP': np.random.rand(),            # Random value, replace with real data
@@ -34,7 +34,7 @@ df_normalized = df.apply(lambda x: (x - x.min()) / (x.max() - x.min()), axis=0)
 # Weights for each indicator (equal weighting for simplicity)
 weights = [0.2, 0.2, 0.2, 0.2, 0.2]  # 5 indicators with equal weight
 
-# Calculate the Economic Fluidity Index (EDI)
+# Calculate the Economic Dynamism Index (EDI)
 df_normalized['EDI'] = df_normalized.dot(weights)
 
 # Sort countries by EDI (higher EDI is better for economic fluidity)
@@ -43,10 +43,10 @@ df_sorted = df_normalized.sort_values(by='EDI', ascending=False)
 # Get the top 10 countries by EDI
 top_10_edi = df_sorted.head(10)
 
-# Plotting a heatmap of the top 10 countries' economic fluidity
+# Plotting a heatmap of the rankings
 plt.figure(figsize=(10, 6))
 sns.heatmap(top_10_edi.drop(columns=['EDI']), annot=True, cmap="coolwarm", fmt=".2f", linewidths=1)
-plt.title('Top 10 Most Populated Countries by Economic Fluidity (EDI)')
+plt.title('Top 10 Most Populated Countries by Economic Dynamism (EDI)')
 plt.xlabel('Economic Indicators')
 plt.ylabel('Countries')
 plt.show()

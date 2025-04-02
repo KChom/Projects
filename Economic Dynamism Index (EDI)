@@ -1,31 +1,56 @@
-import requests
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import requests
 
-# API endpoint (replace with a live API providing updated data)
-url = "https://api.example.com/economic-data"
+# List of top 10 most populated countries
+countries = ["China", "India", "USA", "Indonesia", "Pakistan", "Brazil", "Nigeria", "Bangladesh", "Russia", "Mexico"]
 
-# Function to fetch data
-def fetch_economic_data():
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        print("Failed to fetch data")
-        return None
+# Function to fetch economic data (replace with actual data sources or APIs)
+def fetch_economy_data(country):
+    # Example: Replace with actual data API calls for each indicator
+    data = {
+        'Ease of Doing Business': np.random.rand(),  # Random value, replace with real data
+        'R&D % of GDP': np.random.rand(),            # Random value, replace with real data
+        'Capital Formation % of GDP': np.random.rand(), # Random value, replace with real data
+        'Labor Flexibility': np.random.rand(),       # Random value, replace with real data
+        'Macroeconomic Stability': np.random.rand(),  # Random value, replace with real data
+    }
+    return data
 
-# Fetch and process data
-economic_data = fetch_economic_data()
+# Collect data for each country
+country_data = []
+for country in countries:
+    data = fetch_economy_data(country)
+    country_data.append(data)
 
-if economic_data:
-    # Process the data into a DataFrame
-    df = pd.DataFrame(economic_data)
+# Convert the collected data into a DataFrame
+df = pd.DataFrame(country_data, index=countries)
 
-    # Normalize data here (optional, depending on your data)
-    # Calculate EDI, etc. (use your formula)
+# Normalize the data (min-max scaling)
+df_normalized = df.apply(lambda x: (x - x.min()) / (x.max() - x.min()), axis=0)
 
-    # Generate the heatmap
-    plt.figure(figsize=(10, 6))
-    sns.
+# Weights for each indicator (equal weighting for simplicity)
+weights = [0.2, 0.2, 0.2, 0.2, 0.2]  # 5 indicators with equal weight
+
+# Calculate the Economic Fluidity Index (EDI)
+df_normalized['EDI'] = df_normalized.dot(weights)
+
+# Sort countries by EDI (higher EDI is better for economic fluidity)
+df_sorted = df_normalized.sort_values(by='EDI', ascending=False)
+
+# Get the top 10 countries by EDI
+top_10_edi = df_sorted.head(10)
+
+# Plotting a heatmap of the top 10 countries' economic fluidity
+plt.figure(figsize=(10, 6))
+sns.heatmap(top_10_edi.drop(columns=['EDI']), annot=True, cmap="coolwarm", fmt=".2f", linewidths=1)
+plt.title('Top 10 Most Populated Countries by Economic Fluidity (EDI)')
+plt.xlabel('Economic Indicators')
+plt.ylabel('Countries')
+plt.show()
+
+# Print the sorted EDI values for the countries
+print("Top 10 Countries by Economic Fluidity (EDI):")
+print(df_sorted[['EDI']])
